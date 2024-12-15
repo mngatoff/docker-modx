@@ -1,1 +1,1 @@
-FROM mariadb:10.1.38-bionic
+FROM mariadb:11.6
