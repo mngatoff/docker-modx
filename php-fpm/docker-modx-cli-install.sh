@@ -3,9 +3,6 @@ echo "MODX CLI install preparing...";
 
 install_config=$(cat "$HTML_ROOT/setup/config.dist.new.xml")
 
-install_config=$(echo $install_config | sed "s/<database_server>localhost/<database_server>$MODX_DB_SERVER/g")
-echo "  Param: database_server";
-
 install_config=$(echo $install_config | sed "s/<database>modx_modx/<database>$MYSQL_DATABASE/g")
 echo "  Param: database";
 
@@ -15,13 +12,16 @@ echo "  Param: database_user";
 install_config=$(echo $install_config | sed "s/<database_password>db_password/<database_password>$MYSQL_PASSWORD/g")
 echo "  Param: database_password";
 
-install_config=$(echo $install_config | sed "s/<database_connection_charset>utf8/<database_connection_charset>$MODX_DB_CONNECTION_CHARSET/g")
+install_config=$(echo $install_config | sed "s/<database_server>localhost/<database_server>$MODX_DATABASE_SERVER/g")
+echo "  Param: database_server";
+
+install_config=$(echo $install_config | sed "s/<database_connection_charset>utf8/<database_connection_charset>$MODX_DATABASE_CONNECTION_CHARSET/g")
 echo "  Param: database_connection_charset";
 
-install_config=$(echo $install_config | sed "s/<database_charset>utf8/<database_charset>$MODX_DB_CHARSET/g")
+install_config=$(echo $install_config | sed "s/<database_charset>utf8/<database_charset>$MODX_DATABASE_CHARSET/g")
 echo "  Param: database_charset";
 
-install_config=$(echo $install_config | sed "s/<database_collation>utf8_general_ci/<database_collation>$MODX_DB_CHARSET_COLLATION/g")
+install_config=$(echo $install_config | sed "s/<database_collation>utf8_general_ci/<database_collation>$MODX_DATABASE_CHARSET_COLLATION/g")
 echo "  Param: database_collation";
 
 install_config=$(echo $install_config | sed "s/<table_prefix>modx_/<table_prefix>$MODX_TABLE_PREFIX/g")
@@ -50,9 +50,6 @@ echo "  Param: cmspassword";
 
 install_config=$(echo $install_config | sed "s/<cmsadminemail>email@address.com/<cmsadminemail>$MODX_CMS_EMAIL/g")
 echo "  Param: cmsadminemail";
-
-install_config=$(echo $install_config | sed "s/<remove_setup_directory>1/<remove_setup_directory>$MODX_REMOVE_SETUP_DIRECTORY/g")
-echo "  Param: remove_setup_directory";
 
 MODX_CONTEXT_CONNECTORS_PATH=$(echo $MODX_CONTEXT_CONNECTORS_PATH | sed "s/\//\\\\\//g")
 install_config=$(echo $install_config | sed "s/<context_connectors_path>\/www\/modx\/connectors\//<context_connectors_path>$MODX_CONTEXT_CONNECTORS_PATH/g")

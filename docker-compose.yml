@@ -1,51 +1,56 @@
-services:
-    #database
-    mariadb:
-      container_name: "modx_db"
-      build: ./mariadb
-      ports:
-        - "3306"
-      volumes:
-        - ./mariadb/instance:/var/lib/mysql:rw
-        # MySQL config
-        - ./mariadb/config/local.cnf:/etc/mysql/conf.d/local.cnf:ro
-      env_file:
-        - ./mariadb/credentials.env
-      command: "mariadbd --sql-mode=NO_ENGINE_SUBSTITUTION --default-authentication-plugin=caching_sha2_password"
-    
-    # php-fpm
-    php:
-      container_name: "modx_fpm"
-      build: ./php-fpm
-      ports:
-        - "9000"
-        - "9009"
-      volumes:
-        - ./app/public:/var/www/html:rw
-        # php.ini
-        - ./php-fpm/config/php.ini:/usr/local/etc/php/php.ini:ro
-      env_file:
-        - ./mariadb/credentials.env
-        - ./php-fpm/paths.env
-        - ./php-fpm/modx_install.env
-      depends_on:
-        - mariadb
+version: "3.9"
 
-    # web server
-    nginx:
-      container_name: "modx_webserver"
-      build: ./nginx
-      ports:
-        - "80"
-        - "443"
-      volumes:
-        # app
-        - ./app/public:/var/www/html:rw
-        # nginx configs
-        - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-        - ./nginx/conf.d/:/etc/nginx/conf.d/:ro
-        # certificates
-        - ./nginx/ca/server.crt/:/etc/nginx/server.crt:ro
-        - ./nginx/ca/server.key/:/etc/nginx/server.key:ro
-      depends_on:
-        - php
+services:
+  mariadb:
+    container_name: "modx_db"
+    image: mariadb:11.6
+    restart: no
+    init: true
+    volumes:
+      - db_data:/var/lib/mysql:rw
+    env_file:
+      - ./environment/database.env
+    ports:
+      - "3306"
+
+  php:
+    container_name: "modx_fpm"
+    build:
+      context: ./php-fpm
+      dockerfile: Dockerfile
+      target: develop
+    ports:
+      - "9000"
+      - "9009"
+    volumes:
+      - ./app/public:/var/www/html:rw
+      - ./php-fpm/config/develop.ini:/usr/local/etc/php/php.ini:ro
+    env_file:
+      - ./environment/database.env
+      - ./environment/modx.env
+    environment:
+      XDEBUG_MODE: debug
+      PHP_IDE_CONFIG: "serverName=localhost"
+    depends_on:
+      - mariadb
+
+  nginx:
+    container_name: "modx_webserver"
+    image: nginx:1.26.2
+    ports:
+      - "80"
+      - "443"
+    volumes:
+      - ./app/public:/var/www/html:rw
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d/:/etc/nginx/conf.d/:ro
+      # certificates
+      - ./nginx/ca/server.crt/:/etc/nginx/server.crt:ro
+      - ./nginx/ca/server.key/:/etc/nginx/server.key:ro
+    environment:
+      SERVER_NAME: "localhost"
+    depends_on:
+      - php
+
+volumes:
+  db_data:

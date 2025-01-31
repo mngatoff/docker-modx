@@ -1,6 +1,7 @@
 .git*
 /app/*
-/mysql/instance
+/secrets
+/.idea
 !.gitkeep
 !.gitignore
 !.github/
