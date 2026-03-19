@@ -1,0 +1,15 @@
+.git*
+.DS_Store
+/.env
+/.idea
+/app/public/assets/images
+/app/public/assets/thumbnails
+/app/public/core/cache
+/app/public/core/config
+/app/public/core/packages
+/app/public/**/config.core.php
+/docker/nginx/certs/*
+/node_modules
+!.gitkeep
+!.gitignore
+!.github/
